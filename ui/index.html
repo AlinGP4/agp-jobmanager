@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Job Manager</title>
+    <link rel="stylesheet" href="https://cfx-nui-sombra_jobmanager/ui/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <div class="panel">
+
+            <!-- Header -->
+            <div class="panel-header">
+                <span class="panel-title">&#9965; Job Manager</span>
+                <button class="btn-icon" id="btn-close" title="Cerrar">&#x2715;</button>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="panel-body">
+
+                <!-- Lista de jobs -->
+                <div class="jobs-sidebar">
+                    <div class="sidebar-header">
+                        <span>Jobs</span>
+                        <button class="btn-small btn-green" id="btn-new-job">+ Nuevo</button>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Buscar job..." />
+                    </div>
+                    <div class="type-filter-wrapper">
+                        <button class="type-filter-btn" id="type-filter-btn">
+                            <span id="type-filter-label">Todos los tipos</span>
+                            <span class="type-filter-arrow">&#9662;</span>
+                        </button>
+                        <div class="type-filter-dropdown" id="type-filter-dropdown" style="display:none;"></div>
+                    </div>
+                    <div class="job-list" id="job-list"></div>
+                </div>
+
+                <!-- Detalle del job -->
+                <div class="job-detail" id="job-detail">
+                    <div class="empty-state">
+                        <div class="empty-icon">&#9965;</div>
+                        <p>Selecciona un job para ver sus detalles</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal crear/editar job -->
+    <div class="modal-overlay" id="modal-job">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="modal-job-title">Crear Job</span>
+                <button class="btn-icon" onclick="closeModal('modal-job')">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre interno <span class="hint">(sin espacios, minúsculas)</span></label>
+                    <input type="text" id="job-name" placeholder="mecanico" />
+                </div>
+                <div class="form-group">
+                    <label>Label (nombre visible)</label>
+                    <input type="text" id="job-label" placeholder="Mecánico" />
+                </div>
+                <div class="form-group" style="position:relative;">
+                    <label>Tipo <span class="hint">(opcional)</span></label>
+                    <input type="text" id="job-type" placeholder="leo" autocomplete="off" />
+                    <div id="job-type-dropdown" class="custom-dropdown" style="display:none;"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Default duty</label>
+                        <select id="job-default-duty">
+                            <option value="true">Sí</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Off-duty pay</label>
+                        <select id="job-off-duty-pay">
+                            <option value="false">No</option>
+                            <option value="true">Sí</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-gray" onclick="closeModal('modal-job')">Cancelar</button>
+                <button class="btn btn-green" id="btn-save-job">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal crear/editar grado -->
+    <div class="modal-overlay" id="modal-grade">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="modal-grade-title">Añadir Grado</span>
+                <button class="btn-icon" onclick="closeModal('modal-grade')">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Número de grado</label>
+                        <input type="number" id="grade-num" min="0" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Pago ($)</label>
+                        <input type="number" id="grade-payment" min="0" placeholder="50" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nombre del grado</label>
+                    <input type="text" id="grade-name" placeholder="Empleado" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="grade-isboss" />
+                        <label for="grade-isboss">Es jefe (isboss)</label>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="grade-bankauth" />
+                        <label for="grade-bankauth">Acceso banco</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-gray" onclick="closeModal('modal-grade')">Cancelar</button>
+                <button class="btn btn-green" id="btn-save-grade">Guardar Grado</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal confirmación borrar -->
+    <div class="modal-overlay" id="modal-confirm">
+        <div class="modal" style="width:340px;">
+            <div class="modal-header">
+                <span>Confirmar eliminación</span>
+                <button class="btn-icon" onclick="closeModal('modal-confirm')">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-confirm-text" style="font-size:13px;color:var(--text-muted);line-height:1.5;"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-gray" onclick="closeModal('modal-confirm')">Cancelar</button>
+                <button class="btn btn-red" id="btn-confirm-delete">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notificacion -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cfx-nui-sombra_jobmanager/ui/js/app.js"></script>
+</body>
+</html>
