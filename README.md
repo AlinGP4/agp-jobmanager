@@ -2,6 +2,8 @@
 
 Panel de administración con NUI para gestionar jobs en caliente, sin necesidad de reiniciar el servidor.
 
+[![Watch the video](https://img.youtube.com/vi/GAeKr7WKaFA/maxresdefault.jpg)](https://youtu.be/GAeKr7WKaFA)
+
 ## Compatibilidad
 
 | Framework | Estado |
@@ -19,7 +21,7 @@ El framework se detecta automáticamente al iniciar el recurso.
 
 ## Instalación
 
-1. Copia la carpeta `sombra_jobmanager` dentro de tu carpeta `[standalone]`
+1. Copia la carpeta `agp_jobmanager` dentro de tu carpeta `[standalone]`
 2. Asegúrate de que `[standalone]` esté en tu `server.cfg` con `ensure [standalone]`
 3. Añade los permisos de administrador (ver abajo)
 
