@@ -116,9 +116,9 @@ local function fwGetJobs()
         end
         for _, g in ipairs(grades) do
             if result[g.job_name] then
-                result[g.job_name].grades[g.grade] = {
+                result[g.job_name].grades[tonumber(g.grade)] = {
                     name     = g.name,
-                    payment  = g.salary or 0,
+                    payment  = tonumber(g.salary) or 0,
                     isboss   = g.is_boss == 1 or g.isboss == 1,
                     bankAuth = false,
                 }
@@ -154,6 +154,14 @@ local function fwCreateJob(name, job)
             MySQL.update.await('UPDATE jobs SET label = ? WHERE name = ?', { job.label, name })
         else
             MySQL.insert.await('INSERT INTO jobs (name, label) VALUES (?, ?)', { name, job.label })
+            -- Insertar grado inicial en job_grades (requerido por ESX Legacy)
+            local initialGrade = job.grades and job.grades[0]
+            local gradeName    = initialGrade and initialGrade.name    or 'Empleado'
+            local gradeSalary  = initialGrade and initialGrade.payment or 50
+            MySQL.insert.await(
+                'INSERT INTO job_grades (job_name, grade, name, player_name, salary, skin_male, skin_female) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                { name, 0, gradeName, gradeName, gradeSalary, '{}', '{}' }
+            )
         end
         return true, 'ok'
     end
@@ -227,12 +235,12 @@ local function fwUpsertGrade(jobName, grade, data)
             'SELECT COUNT(*) FROM job_grades WHERE job_name = ? AND grade = ?', { jobName, grade })
         if existing and existing > 0 then
             MySQL.update.await(
-                'UPDATE job_grades SET name = ?, salary = ? WHERE job_name = ? AND grade = ?',
-                { data.name, data.payment, jobName, grade })
+                'UPDATE job_grades SET name = ?, player_name = ?, salary = ? WHERE job_name = ? AND grade = ?',
+                { data.name, data.name, data.payment, jobName, grade })
         else
             MySQL.insert.await(
-                'INSERT INTO job_grades (job_name, grade, name, salary) VALUES (?, ?, ?, ?)',
-                { jobName, grade, data.name, data.payment })
+                'INSERT INTO job_grades (job_name, grade, name, player_name, salary, skin_male, skin_female) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                { jobName, grade, data.name, data.name, data.payment, '{}', '{}' })
         end
         return true, 'ok'
     end
