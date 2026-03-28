@@ -159,7 +159,7 @@ local function fwCreateJob(name, job)
             local gradeName    = initialGrade and initialGrade.name    or 'Empleado'
             local gradeSalary  = initialGrade and initialGrade.payment or 50
             MySQL.insert.await(
-                'INSERT INTO job_grades (job_name, grade, name, player_name, salary, skin_male, skin_female) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO job_grades (job_name, grade, name, label, salary, skin_male, skin_female) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 { name, 0, gradeName, gradeName, gradeSalary, '{}', '{}' }
             )
         end
@@ -183,8 +183,8 @@ local function fwRemoveJob(name)
         return true, 'ok'
 
     elseif FW_TYPE == 'esx' then
-        MySQL.update.await('DELETE FROM job_grades WHERE job_name = ?', { name })
-        MySQL.update.await('DELETE FROM jobs WHERE name = ?', { name })
+        MySQL.query.await('DELETE FROM job_grades WHERE job_name = ?', { name })
+        MySQL.query.await('DELETE FROM jobs WHERE name = ?', { name })
         return true, 'ok'
     end
     return false, 'no_framework'
@@ -235,11 +235,11 @@ local function fwUpsertGrade(jobName, grade, data)
             'SELECT COUNT(*) FROM job_grades WHERE job_name = ? AND grade = ?', { jobName, grade })
         if existing and existing > 0 then
             MySQL.update.await(
-                'UPDATE job_grades SET name = ?, player_name = ?, salary = ? WHERE job_name = ? AND grade = ?',
+                'UPDATE job_grades SET name = ?, label = ?, salary = ? WHERE job_name = ? AND grade = ?',
                 { data.name, data.name, data.payment, jobName, grade })
         else
             MySQL.insert.await(
-                'INSERT INTO job_grades (job_name, grade, name, player_name, salary, skin_male, skin_female) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO job_grades (job_name, grade, name, label, salary, skin_male, skin_female) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 { jobName, grade, data.name, data.name, data.payment, '{}', '{}' })
         end
         return true, 'ok'
@@ -263,7 +263,7 @@ local function fwRemoveGrade(jobName, grade)
         return true, 'ok'
 
     elseif FW_TYPE == 'esx' then
-        MySQL.update.await(
+        MySQL.query.await(
             'DELETE FROM job_grades WHERE job_name = ? AND grade = ?', { jobName, grade })
         return true, 'ok'
     end
